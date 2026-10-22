@@ -227,11 +227,11 @@ symmetrize `P`. `kf_update()` performs the update equations.
 | Math | Code in `kf_update()` |
 | --- | --- |
 | $S=HP^{-}H^{\top}+R$ | `_tmp_mn = H P`; `_S = _tmp_mn H^T`; `_S += R` |
-| $S=LL^{\top}$ | `mat_chol(_S, KF_M)` overwrites `_S` with `L` |
+| $S=LL^{\top}$ | `mat_chol(_S, KF_M)` stores `L` in the lower triangle of `_S` |
 | $K=P^{-}H^{\top}S^{-1}$ | `mat_chol_solve(_S, _tmp_mn, M, N)` solves $SX=HP^{-}$; `_K = X^{\top}` |
 | $\tilde{y}=z-H\hat{x}^{-}$ | `_y = H x`; `_y = z - _y` |
 | $\hat{x}=\hat{x}^{-}+K\tilde{y}$ | `_tmp_n1 = K _y`; `x += _tmp_n1` |
-| Joseph form | `_tmp_nn = K H`; `I - K H`; two `mat_mul_bt` calls; add $KRK^{\top}$ |
+| Joseph form | `_tmp_nn = K H`; `_tmp_nn = I - _tmp_nn`; `_tmp_nn_2 = _tmp_nn P`; `P = _tmp_nn_2 _tmp_nn^T`; `_tmp_nm = K R`; `_tmp_nn_2 = _tmp_nm K^T`; `P += _tmp_nn_2` (three `mat_mul`, two `mat_mul_bt`) |
 
 The gain is computed by solving $SX=HP^{-}$ with a Cholesky factorization of
 $S$, then transposing $X$. This avoids forming $S^{-1}$ explicitly. The Cholesky
@@ -430,9 +430,9 @@ injection Jacobian is $G=I$.
 | $K=P^{-}H^{\top}S^{-1}$ | `mat_chol_solve()` then transpose into `_K` |
 | $h(x^{-})$ | `measure_model()` before injection |
 | $\delta\hat{x}=K(z-h)$ | `_y = z - _y`; `dx = K _y` |
-| Joseph form | same sequence as the KF |
+| Joseph form | same sequence as the KF (three `mat_mul`, two `mat_mul_bt`) |
 | $x\leftarrow x\boxplus\delta x$ | `inject(x_nom, dx, params)` |
-| $P\leftarrow GPG^{\top}$ | `compute_G(G, dx, params)`; two `mat_mul_bt` calls |
+| $P\leftarrow GPG^{\top}$ | `compute_G(G, dx, params)`; `_tmp_nn = G P` (`mat_mul`); `P = _tmp_nn G^T` (`mat_mul_bt`) |
 | reset | `memset(dx, 0, ...)` |
 
 `Fx`, `dx`, `P` and `G` live in the error-state dimension `ESKF_N`. `x_nom`
@@ -555,12 +555,12 @@ remove a large fraction of it. Typical changes:
 - **No control input:** remove `B`/`u`, the control term in the KF predict, and
   the `_tmp_n1_2` workspace if you specialize the function.
 - **No process-noise Jacobian:** if noise is additive in the error state, set
-  `Fi = I`, `ESKF_NW = ESKF_N` and remove the `Fi Q Fi^T` multiplication.
+  `Fi = I`, `ESKF_NW = ESKF_N` and replace the `Fi Q Fi^T` product with `Q`.
 - **Equal nominal/error dimensions:** if `ESKF_N_NOM == ESKF_N` and the
   injection is additive, the nominal state can use the same layout as the error
   state and `G = I`.
-- **No injection Jacobian:** return `G = I` and remove the two `mat_mul_bt`
-  calls after injection.
+- **No injection Jacobian:** return `G = I` and remove the one `mat_mul` and
+  one `mat_mul_bt` call after injection.
 - **Constant matrices:** build `F`, `B`, `H`, `Q` and `R` once outside the
   loop instead of passing them every step.
 - **Sparse structure:** if `H` selects states directly, replace the generic

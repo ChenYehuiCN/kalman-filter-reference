@@ -4,8 +4,7 @@
 
 # 示例程序
 
-这里有两个把库当成黑盒使用的完整示例。C 程序负责仿真和调用库，Python 只
-读取生成的 CSV 并画图。库源码**没有做任何修改**。
+这里有两个把库当成黑盒使用的完整示例。C 程序负责仿真和调用库，Python 只读取生成的 CSV 并画图。库源码**没有做任何修改**。
 
 | 示例 | 滤波器 | 维数 | 演示内容 |
 | --- | --- | --- | --- |
@@ -65,8 +64,7 @@ python3 eskf_localization/plot.py eskf_localization/output/eskf_localization.csv
 | `eskf_localization/output/eskf_errors.png` | ESKF 误差和 ±2σ；右列放大 `t ≥ 1 s` |
 | `eskf_localization/output/eskf_vs_dr.png` | ESKF 与航位推算的误差对比（对数坐标） |
 
-每个 `plot.py` 的默认 CSV 路径是相对脚本目录解析的，所以也可以从仓库根目录
-直接运行：
+每个 `plot.py` 的默认 CSV 路径是相对脚本目录解析的，所以也可以从仓库根目录直接运行：
 
 ```bash
 python3 example/kf_tracking/plot.py
@@ -126,8 +124,7 @@ I
 Q = G(\sigma_a^2 I)G^{\top}
 $$
 
-其中 `ACCEL_NOISE = 0.0005 m/s²`。滤波器的 `Q` 使用完全相同的扰动模型，
-因此协方差有明确的统计含义。
+其中 `ACCEL_NOISE = 0.0005 m/s²`。滤波器的 `Q` 使用完全相同的扰动模型，因此协方差有明确的统计含义。
 
 真值初始轨迹是“8”字形：
 
@@ -136,8 +133,7 @@ px(t) = 80 sin(0.35 t)
 py(t) = 45 sin(0.70 t)
 ```
 
-`main.c` 对该轨迹解析求导得到 jerk `u`。控制量在每一步的中点采样，然后再
-传播真值。8 字形只是初始形状；过程噪声会扰动实际路径。
+`main.c` 对该轨迹解析求导得到 jerk `u`。控制量在每一步的中点采样，然后再传播真值。8 字形只是初始形状；过程噪声会扰动实际路径。
 
 ### 时变 GPS 噪声
 
@@ -150,8 +146,7 @@ z = [px, py]^T + N(0, σ_gps² I)
 R = σ_gps² I        （每一步重新构造）
 ```
 
-在 GPS 变差区间，`kf_update()` 收到不同的 `R`。绘图脚本会把 `sigma` 大于
-最小值 1.5 倍的样本自动识别为“坏 GPS”并加阴影。
+在 GPS 变差区间，`kf_update()` 收到不同的 `R`。绘图脚本会把 `sigma` 大于最小值 1.5 倍的样本自动识别为“坏 GPS”并加阴影。
 
 ### 初始条件
 
@@ -202,8 +197,7 @@ jx, jy, sigma
 位置 x/y 落在 2σ 内的比例: 97.3% / 91.1%
 ```
 
-误差图从 `t = 2 s` 开始画；初始收敛过程在 `kf_states.png` 里，控制台输出
-的是全程 RMSE。因此图里显示的 RMSE 可能和全程控制台输出不同，这是正常的。
+误差图从 `t = 2 s` 开始画；初始收敛过程在 `kf_states.png` 里，控制台输出的是全程 RMSE。因此图里显示的 RMSE 可能和全程控制台输出不同，这是正常的。
 
 ### 调参
 
@@ -215,8 +209,7 @@ jx, jy, sigma
 | `x0`、`P0` | 初始估计和初始不确定性 |
 | `T_END`、`DT` | 仿真长度和步长（`STEPS` 自动计算） |
 
-如果改变 GPS 噪声等级，只要“变差”样本的 `sigma` 仍大于最小值的 1.5 倍，
-绘图脚本仍然能自动识别。
+如果改变 GPS 噪声等级，只要“变差”样本的 `sigma` 仍大于最小值的 1.5 倍，绘图脚本仍然能自动识别。
 
 ---
 
@@ -230,10 +223,7 @@ dx = [dpx, dpy, dyaw]^T   (误差，ESKF_N = 3)
 u  = [v, omega]^T         (控制量，用户定义)
 ```
 
-库没有编译期的控制维数：`u` 根本不会通过 `eskf_predict()` 传入。本示例把
-`u` 和 `dt` 放在 `struct model` 里，通过 `params` 传给回调。这里控制量有两个
-分量，过程噪声维数恰好也是 `ESKF_NW = 2`。本示例中名义状态和误差状态都是
-3 维；库允许两者不同（例如 4 元名义四元数配 3 维姿态误差）。
+库没有编译期的控制维数：`u` 根本不会通过 `eskf_predict()` 传入。本示例把 `u` 和 `dt` 放在 `struct model` 里，通过 `params` 传给回调。这里控制量有两个分量，过程噪声维数恰好也是 `ESKF_NW = 2`。本示例中名义状态和误差状态都是 3 维；库允许两者不同（例如 4 元名义四元数配 3 维姿态误差）。
 
 连续时间单轨（unicycle）模型：
 
@@ -243,8 +233,7 @@ $$
 \dot\theta = \omega
 $$
 
-`nominal_propagate()` 使用恒定 `(v, omega)` 下的精确圆弧积分。当
-$|\omega|\Delta t > 10^{-3}$ 时：
+`nominal_propagate()` 使用恒定 `(v, omega)` 下的精确圆弧积分。当 $|\omega|\Delta t > 10^{-3}$ 时：
 
 $$
 p_x^{+} = p_x + \frac{v}{\omega}
@@ -267,10 +256,7 @@ p_x^{+} = p_x + v\cos\theta\,\Delta t,\qquad
 p_y^{+} = p_y + v\sin\theta\,\Delta t
 $$
 
-阈值判断的是 `|omega| * dt`，不是只看 `|omega|`。单精度下，精确公式里的
-两个相近正弦/余弦相减会丢失大量有效位；阈值太小时，解析 $F_x$ 会产生
-虚假的巨大值，机器人直行时协方差会突然跳变。`propagate()` 和
-`motion_jacobians()` 使用完全相同的 `|omega| * dt > 1e-3` 分支。
+阈值判断的是 `|omega| * dt`，不是只看 `|omega|`。单精度下，精确公式里的两个相近正弦/余弦相减会丢失大量有效位；阈值太小时，解析 $F_x$ 会产生虚假的巨大值，机器人直行时协方差会突然跳变。`propagate()` 和 `motion_jacobians()` 使用完全相同的 `|omega| * dt > 1e-3` 分支。
 
 ### 误差状态与雅可比
 
@@ -330,8 +316,7 @@ $$
 \frac{\partial \theta}{\partial \omega} = \Delta t
 $$
 
-小角度分支使用对应的一阶极限。代码里两个分支都有；`motion_jacobians()`
-是 `compute_Fx()` 和 `compute_Fi()` 的唯一实现来源。
+小角度分支使用对应的一阶极限。代码里两个分支都有；`motion_jacobians()` 是 `compute_Fx()` 和 `compute_Fi()` 的唯一实现来源。
 
 ### 量测模型
 
@@ -380,8 +365,7 @@ s & -c & -h_x
 \end{bmatrix}
 $$
 
-其中 $h_x,h_y$ 是 $h_i$ 的两个分量。C 和 Python 使用相同的路标坐标；
-如果修改地图，需要同时更新 `main.c` 和 `plot.py`。
+其中 $h_x,h_y$ 是 $h_i$ 的两个分量。C 和 Python 使用相同的路标坐标；如果修改地图，需要同时更新 `main.c` 和 `plot.py`。
 
 ### 误差注入与 G
 
@@ -397,8 +381,7 @@ $$
 G = \frac{\partial(x\boxplus\delta x)}{\partial\delta x} = I
 $$
 
-`compute_G()` 仍然实现了，并返回单位阵；库在每次注入后执行
-$P\leftarrow GPG^{\top}$。
+`compute_G()` 仍然实现了，并返回单位阵；库在每次注入后执行 $P\leftarrow GPG^{\top}$。
 
 ### 噪声模型与多速率循环
 
@@ -410,8 +393,7 @@ v_{\text{true}} = v_{\text{cmd}} + \mathcal{N}(0,\sigma_v^2),
 \omega_{\text{true}} = \omega_{\text{cmd}} + \mathcal{N}(0,\sigma_\omega^2)
 $$
 
-其中 `SIGMA_V = 0.10 m/s`、`SIGMA_W = 0.04 rad/s`。滤波器只拿到命令控制量；
-执行噪声通过下式进入协方差：
+其中 `SIGMA_V = 0.10 m/s`、`SIGMA_W = 0.04 rad/s`。滤波器只拿到命令控制量；执行噪声通过下式进入协方差：
 
 $$
 P^{-} = F_xPF_x^{\top}+F_iQF_i^{\top}.
@@ -432,9 +414,7 @@ MEAS_EVERY = 10          -> 10 Hz 量测更新
 T_END = 60 s             -> 6000 步，600 次更新
 ```
 
-循环每一步调用 `eskf_predict()`，仅当 `k % MEAS_EVERY == 0` 时调用
-`eskf_update()`。两个滤波器都把预测和更新拆开了；ESKF 示例利用这一点让
-二者以不同频率运行。
+循环每一步调用 `eskf_predict()`，仅当 `k % MEAS_EVERY == 0` 时调用 `eskf_update()`。两个滤波器都把预测和更新拆开了；ESKF 示例利用这一点让二者以不同频率运行。
 
 ### 控制曲线与初始条件
 
@@ -446,8 +426,7 @@ omega(t) = 0.55 sin(0.23 t) + 0.20 sin(0.61 t)    [rad/s]
 初始协方差: P0 = diag(4, 4, 0.35²)
 ```
 
-真值从 `(0,0,0)` 出发。航位推算（dead reckoning）从同一个偏移初值出发，
-只积分命令控制量，不做任何量测更新。
+真值从 `(0,0,0)` 出发。航位推算（dead reckoning）从同一个偏移初值出发，只积分命令控制量，不做任何量测更新。
 
 ### 库调用与回调
 
@@ -469,9 +448,7 @@ for (k = 1; k <= STEPS; k++) {
 }
 ```
 
-7 个回调全部实现。`params` 指向 `struct model`，里面保存三个路标、当前控制
-量 `u` 和 `dt`。库源码没有修改。注意 `eskf_init()` 的回调顺序：
-`compute_Hx` 在 `measure_model` 前面。
+7 个回调全部实现。`params` 指向 `struct model`，里面保存三个路标、当前控制量 `u` 和 `dt`。库源码没有修改。注意 `eskf_init()` 的回调顺序：`compute_Hx` 在 `measure_model` 前面。
 
 ### CSV 列
 
@@ -484,8 +461,7 @@ Pxx, Pxy, Pyy, Pyaw,
 v_cmd, w_cmd
 ```
 
-`yaw` 列已经 wrap 到 $[-\pi,\pi]$。Python 脚本用 wrap 后的差值计算航向误差。
-`Pxx/Pyy/Pyaw` 是方差，`Pxy` 是位置协方差。
+`yaw` 列已经 wrap 到 $[-\pi,\pi]$。Python 脚本用 wrap 后的差值计算航向误差。`Pxx/Pyy/Pyaw` 是方差，`Pxy` 是位置协方差。
 
 ### 结果（固定随机种子）
 
@@ -499,9 +475,7 @@ ESKF 航向 RMSE : 0.518°      最终误差: 0.390°
 x/y/yaw 落在 2σ 内的比例: 97.5% / 93.7% / 99.4%
 ```
 
-`eskf_errors.png` 左列是全程，右列是 `t ≥ 1 s` 的稳态放大。
-`eskf_vs_dr.png` 使用对数纵轴，可以同时看清初始收敛和 ESKF 与航位推算的
-稳态差距。
+`eskf_errors.png` 左列是全程，右列是 `t ≥ 1 s` 的稳态放大。`eskf_vs_dr.png` 使用对数纵轴，可以同时看清初始收敛和 ESKF 与航位推算的稳态差距。
 
 ### 调参
 
@@ -516,16 +490,13 @@ x/y/yaw 落在 2σ 内的比例: 97.5% / 93.7% / 99.4%
 | Makefile 里的 `ESKF_M` | 等于路标数的两倍 |
 | `T_END`、`DT` | 仿真长度和步长（`STEPS` 自动计算） |
 
-如果改变路标数量，要同时修改 Makefile 里的 `-DESKF_M`（`2 × 路标数`）和
-`model.landmark` 初始化。`main.c` 的 `NUM_LANDMARKS` 会自动从 `ESKF_M`
-推导；`plot.py` 仍然需要手动同步自己的路标列表。
+如果改变路标数量，要同时修改 Makefile 里的 `-DESKF_M`（`2 × 路标数`）和 `model.landmark` 初始化。`main.c` 的 `NUM_LANDMARKS` 会自动从 `ESKF_M` 推导；`plot.py` 仍然需要手动同步自己的路标列表。
 
 ---
 
 ## 编译期维数
 
-库结构体里是固定长度数组，因此下面这些宏必须同时传给**库的 `.c` 文件**和
-**用户的 `.c` 文件**：
+库结构体里是固定长度数组，因此下面这些宏必须同时传给**库的 `.c` 文件**和 **用户的 `.c` 文件**：
 
 | 示例 | Makefile 参数 |
 | --- | --- |
@@ -544,19 +515,12 @@ x/y/yaw 落在 2σ 内的比例: 97.5% / 93.7% / 99.4%
 #endif
 ```
 
-如果不加 `-D` 直接编译，头文件会退回维数 1，检查会给出明确错误，而不是
-产生结构体布局不一致的未定义行为。`ESKF_N_NOM` 是名义状态维数，
-`ESKF_N` 是误差状态维数；本示例中两者相等，但在四元数姿态估计等模型里
-可以不同。
+如果不加 `-D` 直接编译，头文件会退回维数 1，检查会给出明确错误，而不是产生结构体布局不一致的未定义行为。`ESKF_N_NOM` 是名义状态维数，`ESKF_N` 是误差状态维数；本示例中两者相等，但在四元数姿态估计等模型里可以不同。
 
 ## 说明
 
-- 两个示例都使用固定种子的 xorshift64* + Box-Muller 随机数。修改
-  `struct rng rng = {...}` 的种子即可改变噪声实现。
-- C 程序接受一个可选的输出路径参数；直接运行 `./kf_demo` 或 `./eskf_demo`
-  会写到当前目录。
-- 绘图脚本默认使用 `Agg` 后端，只保存 PNG；加 `--show` 会用可用的 GUI 后端
-  打开图片。
+- 两个示例都使用固定种子的 xorshift64* + Box-Muller 随机数。修改 `struct rng rng = {...}` 的种子即可改变噪声实现。
+- C 程序接受一个可选的输出路径参数；直接运行 `./kf_demo` 或 `./eskf_demo` 会写到当前目录。
+- 绘图脚本默认使用 `Agg` 后端，只保存 PNG；加 `--show` 会用可用的 GUI 后端打开图片。
 - 生成的 CSV 和图已被 Git 忽略；`make demo` 可以重新生成。
-- 示例可以用 `-std=c11 -Wall -Wextra -Wpedantic` 干净编译，并且用
-  AddressSanitizer/UndefinedBehaviorSanitizer 运行过。
+- 示例可以用 `-std=c11 -Wall -Wextra -Wpedantic` 干净编译，并且用 AddressSanitizer/UndefinedBehaviorSanitizer 运行过。
