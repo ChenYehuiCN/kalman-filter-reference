@@ -351,7 +351,7 @@ $$
 
 | 公式 | `eskf_predict()` / `eskf_update()` 中的代码 |
 | --- | --- |
-| $F_x$、$F_i$ | 传播前的 `compute_Fx()`、`compute_Fi()`；`Fx` 是 `ESKF_N × ESKF_N`，`Fi` 是 `ESKF_N × ESKF_NW` |
+| $F_x, F_i$ | 传播前的 `compute_Fx()`、`compute_Fi()`；`Fx` 是 `ESKF_N × ESKF_N`，`Fi` 是 `ESKF_N × ESKF_NW` |
 | $x^{-}=f(x,u,\Delta t)$ | `nominal_propagate()`；`x_nom` 长度为 `ESKF_N_NOM` |
 | $P^{-}=F_xPF_x^{\top}+F_iQF_i^{\top}$ | `_tmp_nn = Fx P`；`P = _tmp_nn Fx^T`；`_tmp_nw = Fi Q`；`_tmp_nn = _tmp_nw Fi^T`；相加 |
 | $H$ | 注入前的 `compute_Hx()`；`Hx` 是 `ESKF_M × ESKF_N` |

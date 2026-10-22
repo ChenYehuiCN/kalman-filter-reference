@@ -421,7 +421,7 @@ injection Jacobian is $G=I$.
 
 | Math | Code in `eskf_predict()` / `eskf_update()` |
 | --- | --- |
-| $F_x$, $F_i$ | `compute_Fx()`, `compute_Fi()` before propagation; `Fx` is `ESKF_N × ESKF_N`, `Fi` is `ESKF_N × ESKF_NW` |
+| $F_x, F_i$ | `compute_Fx()`, `compute_Fi()` before propagation; `Fx` is `ESKF_N × ESKF_N`, `Fi` is `ESKF_N × ESKF_NW` |
 | $x^{-}=f(x,u,\Delta t)$ | `nominal_propagate()`; `x_nom` is `ESKF_N_NOM` long |
 | $P^{-}=F_xPF_x^{\top}+F_iQF_i^{\top}$ | `_tmp_nn = Fx P`; `P = _tmp_nn Fx^T`; `_tmp_nw = Fi Q`; `_tmp_nn = _tmp_nw Fi^T`; add |
 | $H$ | `compute_Hx()` at the pre-injection nominal state; `Hx` is `ESKF_M × ESKF_N` |
