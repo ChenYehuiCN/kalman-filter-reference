@@ -1,0 +1,11 @@
+# Build artifacts
+kf_tracking/kf_demo
+eskf_localization/eskf_demo
+
+# Generated data and figures
+kf_tracking/output/
+eskf_localization/output/
+
+# Python cache
+__pycache__/
+*.pyc
